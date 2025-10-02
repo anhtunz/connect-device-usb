@@ -1,0 +1,4 @@
+arb-dir: lib/product/lang/l10n
+template-arb-file: app_vi.arb
+output-localization-file: app_localizations.dart
+untranslated-messages-file: sfmTranslateErrors.txt
