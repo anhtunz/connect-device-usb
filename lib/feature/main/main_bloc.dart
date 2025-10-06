@@ -22,6 +22,10 @@ class MainBloc extends BlocBase {
   StreamSink<bool> get sinkIsVNIcon => isVNIcon.sink;
   Stream<bool> get streamIsVNIcon => isVNIcon.stream;
 
+  final line = StreamController<String>.broadcast();
+  StreamSink<String> get sinkLine => line.sink;
+  Stream<String> get streamLine => line.stream;
+
   @override
   void dispose() {}
 

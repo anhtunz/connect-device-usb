@@ -9,8 +9,6 @@ import 'package:usb_serial/usb_serial.dart';
 
 import '../../product/services/language_services.dart';
 
-
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -34,59 +32,86 @@ class _MainScreenState extends State<MainScreen> {
   Future<bool> _connectTo(device) async {
     _serialData.clear();
 
-    if (_subscription != null) {
-      _subscription!.cancel();
-      _subscription = null;
-    }
+    // Ngắt các kết nối cũ nếu có
+    await _subscription?.cancel();
+    _subscription = null;
 
-    if (_transaction != null) {
-      _transaction!.dispose();
-      _transaction = null;
-    }
+    _transaction?.dispose();
+    _transaction = null;
 
-    if (_port != null) {
-      _port!.close();
-      _port = null;
-    }
+    await _port?.close();
+    _port = null;
 
     if (device == null) {
       _device = null;
-      setState(() {
-        _status = "Disconnected";
-      });
+      setState(() => _status = "Disconnected");
       return true;
     }
 
+    // Mở cổng mới
     _port = await device.create();
-    if (await (_port!.open()) != true) {
-      setState(() {
-        _status = "Failed to open port";
-      });
+    if (await _port!.open() != true) {
+      setState(() => _status = "Failed to open port");
       return false;
     }
+
     _device = device;
 
     await _port!.setDTR(true);
     await _port!.setRTS(true);
     await _port!.setPortParameters(
-        115200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE);
+      9600,
+      UsbPort.DATABITS_8,
+      UsbPort.STOPBITS_1,
+      UsbPort.PARITY_NONE,
+    );
 
+    // Transaction chia chuỗi theo ký tự xuống dòng (LF)
     _transaction = Transaction.stringTerminated(
-        _port!.inputStream as Stream<Uint8List>, Uint8List.fromList([13, 10]));
+      _port!.inputStream as Stream<Uint8List>,
+      Uint8List.fromList([13, 10]), // \r\n
+    );
 
+    // Lắng nghe dữ liệu
     _subscription = _transaction!.stream.listen((String line) {
-      setState(() {
-        _serialData.add(Text(line));
-        if (_serialData.length > 20) {
-          _serialData.removeAt(0);
-        }
-      });
+      final clean = line.trim();
+      if (clean.isEmpty) return;
+
+      print("📩 Nhận: $clean");
+      mainBloc.sinkLine.add(clean);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(clean),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
     });
 
-    setState(() {
-      _status = "Connected";
-    });
+    setState(() => _status = "Connected");
     return true;
+  }
+
+  Future<void> sendCommand(String command) async {
+    if (_port == null) {
+      print("⚠️ Port chưa kết nối");
+      return;
+    }
+
+    // Append newline giống app Java
+    String msg = "$command\r\n";
+    Uint8List data = Uint8List.fromList(msg.codeUnits);
+
+    try {
+      await _port!.write(data);
+      print("Sent: $command");
+    } catch (e) {
+      print("Error sending: $e");
+    }
   }
 
   void _getPorts() async {
@@ -134,6 +159,16 @@ class _MainScreenState extends State<MainScreen> {
     _getPorts();
   }
 
+  Color getStarColor(String? line) {
+    switch (line?.trim()) {
+      case "S10":
+        return Colors.green;
+      case "S11":
+        return Colors.red;
+      default:
+        return Colors.black;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,41 +177,53 @@ class _MainScreenState extends State<MainScreen> {
         title: const Text('USB Serial Plugin example app'),
       ),
       body: Center(
-          child: Column(children: <Widget>[
-        Text(
-            _ports.isNotEmpty
-                ? "Available Serial Ports"
-                : "No serial devices available",
-            style: Theme.of(context).textTheme.titleLarge),
-        ..._ports,
-        Text('Status: $_status\n'),
-        Text('info: ${_port.toString()}\n'),
-        ListTile(
-          title: TextField(
-            controller: _textController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Text To Send',
+        child: Column(
+          children: <Widget>[
+            StreamBuilder<String>(
+              stream: mainBloc.streamLine,
+              builder: (context, snapshot) {
+                final line = snapshot.data?.trim() ?? ""; // bỏ \r\n nếu có
+                return Icon(
+                  Icons.star,
+                  color: getStarColor(line),
+                );
+              },
             ),
-          ),
-          trailing: ElevatedButton(
-            onPressed: _port == null
-                ? null
-                : () async {
-                    if (_port == null) {
-                      return;
-                    }
-                    String data = "${_textController.text}\r\n";
-                    await _port!.write(Uint8List.fromList(data.codeUnits));
-                    _textController.text = "";
-                  },
-            child: Text("Send"),
-          ),
+            TextButton(
+              onPressed: () async {
+                await sendCommand("RA1");
+              },
+              child: Text("show SnackBar"),
+            ),
+            Text(
+                _ports.isNotEmpty
+                    ? "Available Serial Ports"
+                    : "No serial devices available",
+                style: Theme.of(context).textTheme.titleLarge),
+            ..._ports,
+            Text('Status: $_status\n'),
+            Text('info: ${_port.toString()}\n'),
+            ListTile(
+              title: TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Text To Send',
+                ),
+              ),
+              trailing: ElevatedButton(
+                onPressed: () async {
+                  String text = _textController.text;
+                  await sendCommand(text);
+                },
+                child: Text("Send"),
+              ),
+            ),
+            Text("Result Data", style: Theme.of(context).textTheme.titleLarge),
+            ..._serialData,
+          ],
         ),
-        Text("Result Data", style: Theme.of(context).textTheme.titleLarge),
-        ..._serialData,
-      ])),
+      ),
     );
   }
-
 }
