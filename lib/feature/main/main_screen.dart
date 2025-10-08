@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:usb_serial/transaction.dart';
 import 'package:usb_serial/usb_serial.dart';
 
-import '../../product/services/language_services.dart';
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -43,6 +41,7 @@ class _MainScreenState extends State<MainScreen> {
 
     if (device == null) {
       _device = null;
+      setState(() => _status = "Disconnected");
       _status = "Disconnected";
       mainBloc.addLog(_status);
       return true;
@@ -51,6 +50,7 @@ class _MainScreenState extends State<MainScreen> {
     // Mở cổng mới
     _port = await device.create();
     if (await _port!.open() != true) {
+      setState(() => _status = "Failed to open port");
       _status = "Failed to open port";
       mainBloc.addLog(_status);
       return false;
@@ -78,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
     _subscription = _transaction!.stream.listen((String line) {
       final clean = line.trim();
       if (clean.isEmpty) return;
-
+      print("📩 Nhận: $clean");
       mainBloc.addLog(line);
       mainBloc.updateFromMessage(line);
 
@@ -93,7 +93,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
     });
-
+    setState(() => _status = "Connected");
     _status = "Connected";
     mainBloc.addLog(_status);
     return true;
@@ -142,6 +142,9 @@ class _MainScreenState extends State<MainScreen> {
         ),
       );
     }
+    setState(() {
+      print(_ports);
+    });
   }
 
   @override
@@ -163,7 +166,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _logScrollController = ScrollController();
+    final logScrollController = ScrollController();
 
     return Scaffold(
       appBar: AppBar(
@@ -172,6 +175,20 @@ class _MainScreenState extends State<MainScreen> {
       body: Center(
         child: Column(
           children: <Widget>[
+            TextButton(
+              onPressed: () async {
+                await sendCommand("RA1");
+              },
+              child: Text("show SnackBar"),
+            ),
+            Text(
+                _ports.isNotEmpty
+                    ? "Available Serial Ports"
+                    : "No serial devices available",
+                style: Theme.of(context).textTheme.titleLarge),
+            ..._ports,
+            Text('Status: $_status\n'),
+            Text('info: ${_port.toString()}\n'),
             // 🔹 Stream hiển thị trạng thái thiết bị
             StreamBuilder<CompleteDeviceState>(
               stream: mainBloc.streamDeviceState,
@@ -240,9 +257,9 @@ class _MainScreenState extends State<MainScreen> {
 
                 // auto scroll xuống cuối
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (_logScrollController.hasClients) {
-                    _logScrollController.jumpTo(
-                      _logScrollController.position.maxScrollExtent,
+                  if (logScrollController.hasClients) {
+                    logScrollController.jumpTo(
+                      logScrollController.position.maxScrollExtent,
                     );
                   }
                 });
@@ -253,7 +270,7 @@ class _MainScreenState extends State<MainScreen> {
                   height: 200,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
+                    color: Colors.black.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -280,7 +297,7 @@ class _MainScreenState extends State<MainScreen> {
                       const SizedBox(height: 6),
                       Expanded(
                         child: ListView.builder(
-                          controller: _logScrollController,
+                          controller: logScrollController,
                           itemCount: logs.length,
                           itemBuilder: (context, index) {
                             final log = logs[index];

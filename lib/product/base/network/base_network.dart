@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:base_project/product/utils/logger_utils.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 
 import '../../cache/locale_manager.dart';
 import '../../constants/enums/locale_keys_enum.dart';
@@ -50,32 +48,34 @@ class BaseNetwork {
     // };
 
     // Add interceptors for logging
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
-        AppLoggerUtils.info(
-            'REQUEST[${options.method}] => PATH: ${options.path}');
-        // print('Headers: ${options.headers}');
-        if (options.queryParameters.isNotEmpty) {
-          AppLoggerUtils.info('Query: ${options.queryParameters}');
-        }
-        if(options.data != null){
-           AppLoggerUtils.info('Body: ${options.data}');
-        }
-        return handler.next(options);
-      },
-      onResponse: (Response response, ResponseInterceptorHandler handler) {
-        AppLoggerUtils.info(
-            'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
-        AppLoggerUtils.info('Data: ${response.data}');
-        return handler.next(response);
-      },
-      onError: (DioException e, ErrorInterceptorHandler handler) {
-        AppLoggerUtils.error(
-            'ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
-        AppLoggerUtils.error('Error Message: ${e.message}');
-        return handler.next(e);
-      },
-    ));
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
+          AppLoggerUtils.info(
+              'REQUEST[${options.method}] => PATH: ${options.path}');
+          // print('Headers: ${options.headers}');
+          if (options.queryParameters.isNotEmpty) {
+            AppLoggerUtils.info('Query: ${options.queryParameters}');
+          }
+          if (options.data != null) {
+            AppLoggerUtils.info('Body: ${options.data}');
+          }
+          return handler.next(options);
+        },
+        onResponse: (Response response, ResponseInterceptorHandler handler) {
+          AppLoggerUtils.info(
+              'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
+          AppLoggerUtils.info('Data: ${response.data}');
+          return handler.next(response);
+        },
+        onError: (DioException e, ErrorInterceptorHandler handler) {
+          AppLoggerUtils.error(
+              'ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
+          AppLoggerUtils.error('Error Message: ${e.message}');
+          return handler.next(e);
+        },
+      ),
+    );
   }
 
   // GET request
