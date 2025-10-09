@@ -69,6 +69,9 @@ B3: Khi quá trình " Tẩy Rửa" xong thì Thiết bị sẽ phản hồi ti�
 
  SE1(Báo cần gỡ bỏ cốc ra khỏi khay khi đã hoàn thành).
 
+ PG5(Khi máy đang chạy mà người dùng gỡ khỏi cốc thì sẽ báo lỗi này - Phải reset máy lại mới được)
+
  PG2(Thông báo các cốc đã gỡ bỏ khỏi khay).
 ====================================================================================================
+
 
