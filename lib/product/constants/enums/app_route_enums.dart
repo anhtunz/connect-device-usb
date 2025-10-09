@@ -2,5 +2,6 @@
 
 enum AppRoutes {
   LOGIN,
+  WELCOME,
   HOME,
 }

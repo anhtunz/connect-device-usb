@@ -1,5 +1,7 @@
+import 'package:base_project/feature/welcome/welcome_screen.dart';
 import 'package:base_project/product/constants/navigation/navigation_constants.dart';
 import 'package:go_router/go_router.dart';
+import 'package:usb_serial/usb_serial.dart';
 
 import '../../feature/main/main_bloc.dart';
 import '../../feature/main/main_screen.dart';
@@ -10,7 +12,7 @@ GoRouter goRouter() {
   return GoRouter(
     debugLogDiagnostics: true,
     // errorBuilder: (context, state) => const NotFoundScreen(),
-    initialLocation: NavigationConstants.HOME_PATH,
+    initialLocation: NavigationConstants.WELCOME_PATH,
     routes: <RouteBase>[
       // GoRoute(
       //   path: ApplicationConstants.LOGIN_PATH,
@@ -20,13 +22,24 @@ GoRouter goRouter() {
       //     blocBuilder: () => LoginBloc(),
       //   ),
       // ),
+      // Welcome path shows the welcome (scan & connect) screen
+      GoRoute(
+        path: NavigationConstants.WELCOME_PATH,
+        name: AppRoutes.WELCOME.name,
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      // Home path is now the main screen; can receive a UsbDevice via extra
       GoRoute(
         path: NavigationConstants.HOME_PATH,
         name: AppRoutes.HOME.name,
-        builder: (context, state) => BlocProvider(
-          child: const MainScreen(),
-          blocBuilder: () => MainBloc(),
-        ),
+        builder: (context, state) {
+          final device =
+              state.extra is UsbDevice ? state.extra as UsbDevice : null;
+          return BlocProvider(
+            child: MainScreen(device: device),
+            blocBuilder: () => MainBloc(),
+          );
+        },
       ),
       // GoRoute(
       //   path: ApplicationConstants.SETTINGS_PATH,

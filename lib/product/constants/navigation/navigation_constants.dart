@@ -4,4 +4,6 @@ class NavigationConstants {
   static const LOGIN_PATH = "/login";
   static const LOGOUT_PATH = "/logout";
   static const HOME_PATH = "/";
+  static const WELCOME_PATH = "/welcome";
+
 }

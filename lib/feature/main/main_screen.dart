@@ -9,7 +9,9 @@ import 'package:usb_serial/transaction.dart';
 import 'package:usb_serial/usb_serial.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final UsbDevice? device;
+
+  const MainScreen({super.key, this.device});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -41,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
 
     if (device == null) {
       _device = null;
-      setState(() => _status = "Disconnected");
+      // setState(() => _status = "Disconnected");
       _status = "Disconnected";
       mainBloc.addLog(_status);
       return true;
@@ -93,7 +95,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
     });
-    setState(() => _status = "Connected");
+    // setState(() => _status = "Connected");
     _status = "Connected";
     mainBloc.addLog(_status);
     return true;
@@ -162,6 +164,10 @@ class _MainScreenState extends State<MainScreen> {
     });
 
     _getPorts();
+    // Auto-connect if device is provided via navigation
+    if (widget.device != null) {
+      _connectTo(widget.device);
+    }
   }
 
   @override

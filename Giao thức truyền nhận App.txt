@@ -1,0 +1,74 @@
+Giao thức truyền/nhận khi Thiết bị đã kết nối UART thành công.
+
+1- Quá trình Kiểm tra Khởi động.
+
+B1: App truyền xuống(phát) lệnh RA1
+B2: Phản hồi từ phần cứng lên App nếu thành công sẽ nhận 3 lệnh báo:
+ PG1: Hiển thị trang thông báo hành trình rửa đã xong. Kèm âm thanh thông báo.
+ SE1: Thông báo Nhắc bỏ cốc ra khỏi khay(Nếu CUP còn trên khay). Kèm âm thanh thông báo.
+ PG2: Thông báo Nếu đã gỡ bỏ hết CUP ra khỏi khay rồi thì tự động chuyển đến trang START (RE1) để vận hành.
+B3: Các lệnh phản hồi về App từ Thiết bị
+    S10: Không có cốc nào trên khay(4 vị trí). Kèm số lượng là "O" được thông báo trên App.
+    S11: Khay có 1 cốc đã được đặt đúng vị trí.Kèm số lượng là "1" được thông báo trên App.
+    S12: Khay có 2 cốc đã được đặt đúng vị trí.Kèm số lượng là "2" được thông báo trên App.
+    S13: Khay có 3 cốc đã được đặt đúng vị trí.Kèm số lượng là "3" được thông báo trên App.
+    S14: Khay có 4 cốc đã được đặt đúng vị trí.Kèm số lượng là "4" được thông báo trên App.
+
+Ngoài ra còn có:
+    S20: Thông báo trên App là Hết chất "Tẩy Rửa" với Ngôi sao hay mặt cười màu Đỏ. Khi đó phát lệnh...     để Thiết bị dừng Hoạt động và chuyển đến giao diện cần cấp chất "Tẩy Rửa".
+    S21: Thông báo trên App là GẦN hết chất "Tẩy Rửa" với Ngôi sao hay mặt cười màu Vàng. Khi đó phát lệnh...     để Thiết bị dừng Hoạt động và chuyển đến giao diện cần cấp chất "Tẩy Rửa".
+    S22: Thông báo trên App là Hết "Nước" với Ngôi sao hay mặt cười màu Đỏ. Khi đó phát lệnh...     để Thiết bị dừng Hoạt động và chuyển đến giao diện cần cấp nước.
+    S23: Báo với Ngôi sao hoặc mặt cười màu XANH( Đủ hóa chất và nước). Cho phép hoạt động bình thường.
+    S30: Thông báo "*" chưa dùng Option1
+    S31: Thông báo "!" chưa dùng Option2
+
+
+2-Quá trình vận hành.
+Quá trình này chỉ bắt đầu khi quá trình kiểm tra trên thành công! Hiển thị trang START (RE1) để vận hành.
+
+B1: Chạy lệnh RE1 từ App gửi xuống Thiết bị.
+B2: Thiết bị nhận lệnh RE1 rồi phản hồi về App là ST1. Nếu các bước trong quá trình kiểm tra Khởi động thành công
+    thì Giao diện Hiển thị trang ST1(Trang hiển thị giao diện chạy Slide từ 0% đến 100% của quá trình "Tẩy Rửa" Thiết bị).
+    Trong quá trình chạy sẽ phản hồi về App thêm lệnh RU1(Đang cấp nước vào Thiết bị), rồi RU3(Phun rửa Thiết bị), rồi RU4(Quá trình rửa đã xong).
+B3: Khi quá trình " Tẩy Rửa" xong thì Thiết bị sẽ phản hồi tiếp về App lệnh SE1(Báo cần gỡ bỏ cốc ra khỏi khay khi đã hoàn thành).
+    Sau khi cốc đã gỡ bỏ khỏi khay thì Thiết bị sẽ phản hồi về App lệnh PG2(Thông báo các cốc đã gỡ bỏ khỏi khay).
+    Giao diện chính START vận hành thông thường hiển thị ra chờ những cốc mới vào vận hành "Tẩy Rửa".
+
+
+
+=====================================   Ý nghĩa tập lệnh"   ========================================
+
+ PG1: Hiển thị trang thông báo hành trình rửa đã xong. Kèm âm thanh thông báo.
+ SE1: Thông báo Nhắc bỏ cốc ra khỏi khay(Nếu CUP còn trên khay). Kèm âm thanh thông báo.
+ PG2: Thông báo Nếu đã gỡ bỏ hết CUP ra khỏi khay rồi thì tự động chuyển đến trang START (RE1) để vận hành.
+
+ S10: Không có cốc nào trên khay(4 vị trí). Kèm số lượng là "O" được thông báo trên App.
+ S11: Khay có 1 cốc đã được đặt đúng vị trí.Kèm số lượng là "1" được thông báo trên App.
+ S12: Khay có 2 cốc đã được đặt đúng vị trí.Kèm số lượng là "2" được thông báo trên App.
+ S13: Khay có 3 cốc đã được đặt đúng vị trí.Kèm số lượng là "3" được thông báo trên App.
+ S14: Khay có 4 cốc đã được đặt đúng vị trí.Kèm số lượng là "4" được thông báo trên App.
+
+ S20: Thông báo trên App là Hết chất "Tẩy Rửa" với Ngôi sao hay mặt cười màu Đỏ. Khi đó phát lệnh...     để Thiết bị dừng Hoạt động và chuyển đến giao diện cần cấp chất "Tẩy Rửa".
+ S21: Thông báo trên App là GẦN hết chất "Tẩy Rửa" với Ngôi sao hay mặt cười màu Vàng. Khi đó phát lệnh...     để Thiết bị dừng Hoạt động và chuyển đến giao diện cần cấp chất "Tẩy Rửa".
+ S22: Thông báo trên App là Hết "Nước" với Ngôi sao hay mặt cười màu Đỏ. Khi đó phát lệnh...     để Thiết bị dừng Hoạt động và chuyển đến giao diện cần cấp nước.
+ S23: Báo với Ngôi sao hoặc mặt cười màu XANH( Đủ hóa chất và nước). Cho phép hoạt động bình thường.
+ S30: Thông báo "*" chưa dùng Option1
+ S31: Thông báo "!" chưa dùng Option2
+
+ RA1: Kiểm tra điều kiện cho Thiết bị vận hành.
+
+ RE1 : Nút START để chạy cho Thiết bị vận hành.
+
+ ST1(Trang hiển thị giao diện chạy Slide từ 0% đến 100% của quá trình "Tẩy Rửa" Thiết bị).
+
+ RU1(Đang cấp nước vào Thiết bị).
+
+ RU3(Phun rửa Thiết bị).
+
+ RU4(Quá trình rửa đã xong).
+
+ SE1(Báo cần gỡ bỏ cốc ra khỏi khay khi đã hoàn thành).
+
+ PG2(Thông báo các cốc đã gỡ bỏ khỏi khay).
+====================================================================================================
+
