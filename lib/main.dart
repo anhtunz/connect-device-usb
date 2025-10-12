@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import 'product/base/bloc/base_bloc.dart';
 import 'product/lang/l10n/app_localizations.dart';
 import 'product/navigation/navigation_router.dart';
@@ -11,6 +13,7 @@ import 'product/services/theme_services.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   LocaleManager.prefrencesInit();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
   runApp(
     BlocProvider(
       child: const MyApp(),

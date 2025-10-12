@@ -45,6 +45,9 @@ dependencies:
   logger: ^2.5.0
   usb_serial: ^0.5.2
   equatable: ^2.0.7
+  material_symbols_icons: ^4.2874.0
+  fluttertoast: ^9.0.0
+  percent_indicator: ^4.2.5
 
 dev_dependencies:
   flutter_test:

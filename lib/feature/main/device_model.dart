@@ -21,7 +21,7 @@ class CompleteDeviceState extends Equatable {
 
   CompleteDeviceState({
     this.processState = ProcessState.idle,
-    this.progress = 0,
+    this.progress = 80,
     this.cupCount = 0,
     this.chemical = ChemicalLevel.ok,
     this.water = WaterLevel.ok,

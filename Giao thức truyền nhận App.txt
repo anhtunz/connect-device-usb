@@ -1,4 +1,4 @@
-Giao thức truyền/nhận khi Thiết bị đã kết nối UART thành công.
+ Giao thức truyền/nhận khi Thiết bị đã kết nối UART thành công.
 
 1- Quá trình Kiểm tra Khởi động.
 
