@@ -66,6 +66,9 @@ class _MainScreenState extends State<MainScreen> {
                 stream: mainBloc.streamDeviceState,
                 builder: (context, snapshot) {
                   final state = snapshot.data ?? CompleteDeviceState();
+                  if (state.processState == ProcessState.running) {
+                    washingTeethProgress(context, state);
+                  }
                   return Column(
                     children: [
                       Row(
@@ -137,8 +140,7 @@ class _MainScreenState extends State<MainScreen> {
                                   washingTeethProgress(
                                       context,
                                       CompleteDeviceState(
-                                          lastNotification:
-                                              NotificationType.pg1));
+                                          processState: ProcessState.running));
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(
