@@ -210,7 +210,7 @@ class MainBloc extends BlocBase {
     if (_isDisposed || deviceState.isClosed) return;
     sinkDeviceState.add(newState);
   }
-
+  
   void startWashingTeeth(
       CompleteDeviceState state, ToastService toastService) async {
     toastService.removeToast();
@@ -236,6 +236,8 @@ class MainBloc extends BlocBase {
   }
 
   final _logs = <String>[];
+
+  List<String> get deviceLogs => List.unmodifiable(_logs);
 
   void addLog(String log) {
     if (_isDisposed || deviceStateLogs.isClosed) return;

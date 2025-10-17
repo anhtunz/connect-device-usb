@@ -52,6 +52,8 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  bool isDialogShown = false;
+
   @override
   Widget build(BuildContext context) {
     final logScrollController = ScrollController();
@@ -67,7 +69,12 @@ class _MainScreenState extends State<MainScreen> {
                 builder: (context, snapshot) {
                   final state = snapshot.data ?? CompleteDeviceState();
                   if (state.processState == ProcessState.running) {
-                    washingTeethProgress(context, state);
+                    if (state.processState == ProcessState.running) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        washingTeethProgress(
+                            context, mainBloc, mainBloc.deviceLogs);
+                      });
+                    }
                   }
                   return Column(
                     children: [
@@ -135,16 +142,16 @@ class _MainScreenState extends State<MainScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(50),
                                 onTap: () async {
-                                  // mainBloc.startWashingTeeth(
-                                  //     state, toastService);
-                                  washingTeethProgress(
-                                      context,
-                                      CompleteDeviceState(
-                                          processState: ProcessState.running));
+                                  mainBloc.startWashingTeeth(
+                                      state, toastService);
+                                  // washingTeethProgress(
+                                  //     context,
+                                  //     CompleteDeviceState(
+                                  //         processState: ProcessState.running));
                                 },
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 14, horizontal: 32),
+                                child: Container(
+                                  padding: EdgeInsets.all(20),
+                                  alignment: Alignment.center,
                                   child: Text(
                                     'Khởi động',
                                     textAlign: TextAlign.center,
