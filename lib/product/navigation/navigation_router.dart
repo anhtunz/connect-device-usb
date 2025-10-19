@@ -12,7 +12,7 @@ GoRouter goRouter() {
   return GoRouter(
     debugLogDiagnostics: true,
     // errorBuilder: (context, state) => const NotFoundScreen(),
-    initialLocation: NavigationConstants.HOME_PATH,
+    initialLocation: NavigationConstants.WELCOME_PATH,
     routes: <RouteBase>[
       // GoRoute(
       //   path: ApplicationConstants.LOGIN_PATH,
