@@ -78,3 +78,12 @@ https://drive.google.com/drive/folders/1g1VpBsnxaWkGh4NfE6rzsHoNVJF1X8C9
 
 
 
+1-Test API control LED by Local IP
+
+ON LED: http://192.168.219.104/alarm2/off2
+OFF LED: http://192.168.219.104/alarm2/on2
+TIMER ON LED lúc 12H45: http://192.168.219.104/time?time=12%3A45
+Ghi chú: %3A = H (giờ)
+        --> 12%3A45 = 12H45
+        --> 13%3A05 = 13H05
+ 
